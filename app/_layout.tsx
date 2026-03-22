@@ -1,57 +1,63 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
+import { useFonts } from 'expo-font';
+import { Stack, router } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
 import 'react-native-reanimated';
 
-import { useColorScheme } from '@/components/useColorScheme';
+import { useAuthStore } from '@/stores/authStore';
 
-export {
-  // Catch any errors thrown by the Layout component.
-  ErrorBoundary,
-} from 'expo-router';
+export { ErrorBoundary } from 'expo-router';
 
-export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: '(tabs)',
-};
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
+// Empêche le splash screen de se masquer avant que les assets soient prêts
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const [loaded, error] = useFonts({
+  const [fontsLoaded, fontError] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
 
-  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
-  useEffect(() => {
-    if (error) throw error;
-  }, [error]);
+  const { initialize, isInitialized, session } = useAuthStore();
 
+  // ── Initialisation Supabase auth au démarrage ──────────────────────────────
   useEffect(() => {
-    if (loaded) {
+    initialize();
+  }, []);
+
+  // ── Propagation erreur de police ───────────────────────────────────────────
+  useEffect(() => {
+    if (fontError) throw fontError;
+  }, [fontError]);
+
+  // ── Masquage du splash screen dès que tout est prêt ───────────────────────
+  useEffect(() => {
+    if (fontsLoaded && isInitialized) {
       SplashScreen.hideAsync();
     }
-  }, [loaded]);
+  }, [fontsLoaded, isInitialized]);
 
-  if (!loaded) {
+  // ── Redirection selon l'état auth ─────────────────────────────────────────
+  useEffect(() => {
+    if (!isInitialized || !fontsLoaded) return;
+
+    if (session) {
+      router.replace('/(tabs)');
+    } else {
+      router.replace('/(auth)/login');
+    }
+  }, [isInitialized, fontsLoaded, session]);
+
+  // Affiche rien pendant le chargement (splash screen visible)
+  if (!fontsLoaded || !isInitialized) {
     return null;
   }
 
-  return <RootLayoutNav />;
-}
-
-function RootLayoutNav() {
-  const colorScheme = useColorScheme();
-
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-      </Stack>
-    </ThemeProvider>
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="(tabs)"  options={{ headerShown: false }} />
+      <Stack.Screen name="(auth)"  options={{ headerShown: false }} />
+      <Stack.Screen name="workout/[id]"  options={{ headerShown: false }} />
+      <Stack.Screen name="session/[id]"  options={{ headerShown: false }} />
+      <Stack.Screen name="+not-found" />
+    </Stack>
   );
 }
