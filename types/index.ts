@@ -1,3 +1,16 @@
+// ─── Notifications ───────────────────────────────────────────────────────────
+
+export interface NotificationPreferences {
+  workout_reminder_enabled: boolean;
+  workout_reminder_hour: number;    // 0–23
+  workout_reminder_minute: number;  // 0–59
+  workout_reminder_days: number[];  // 0=Dimanche, 1=Lundi, …, 6=Samedi
+  streak_danger_enabled: boolean;
+  daily_tasks_reminder_enabled: boolean;
+  daily_tasks_reminder_hour: number;
+  daily_tasks_reminder_minute: number;
+}
+
 // ─── Utilisateur ─────────────────────────────────────────────────────────────
 
 export interface User {
@@ -17,6 +30,7 @@ export interface UserProfile {
   total_xp: number;     // XP cumulé depuis le début
   streak_days: number;  // Jours consécutifs d'activité
   last_active_date: string | null;
+  notification_preferences: NotificationPreferences;
   created_at: string;
   updated_at: string;
 }
