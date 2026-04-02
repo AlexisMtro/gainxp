@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@gorhom/bottom-sheet": "^5.2.8",
+    "@react-native-community/netinfo": "^12.0.1",
     "@react-navigation/native": "^7.1.33",
     "@supabase/supabase-js": "^2.99.3",
     "date-fns": "^4.1.0",
