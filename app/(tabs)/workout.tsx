@@ -224,6 +224,12 @@ export default function WorkoutScreen() {
         ListEmptyComponent={ListEmpty}
         contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 100 }}
         showsVerticalScrollIndicator={false}
+        // ── Optimisations de rendu ─────────────────────────
+        maxToRenderPerBatch={8}
+        updateCellsBatchingPeriod={50}
+        windowSize={8}
+        initialNumToRender={6}
+        removeClippedSubviews
       />
 
       {/* FAB : créer un programme */}

@@ -3,10 +3,12 @@ import { useFonts } from 'expo-font';
 import { Stack, router } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import 'react-native-reanimated';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { useAuthStore } from '@/stores/authStore';
-
-export { ErrorBoundary } from 'expo-router';
+import ErrorBoundary from '@/components/ErrorBoundary';
+import { Toast } from '@/components/ui/Toast';
+import { OfflineBanner } from '@/components/ui/OfflineBanner';
 
 // Empêche le splash screen de se masquer avant que les assets soient prêts
 SplashScreen.preventAutoHideAsync();
@@ -52,12 +54,20 @@ export default function RootLayout() {
   }
 
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="(tabs)"  options={{ headerShown: false }} />
-      <Stack.Screen name="(auth)"  options={{ headerShown: false }} />
-      <Stack.Screen name="workout/[id]"  options={{ headerShown: false }} />
-      <Stack.Screen name="session/[id]"  options={{ headerShown: false }} />
-      <Stack.Screen name="+not-found" />
-    </Stack>
+    <ErrorBoundary>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="(tabs)"         options={{ headerShown: false }} />
+          <Stack.Screen name="(auth)"         options={{ headerShown: false }} />
+          <Stack.Screen name="workout/[id]"   options={{ headerShown: false }} />
+          <Stack.Screen name="workout/create" options={{ headerShown: false }} />
+          <Stack.Screen name="session/[id]"   options={{ headerShown: false }} />
+          <Stack.Screen name="+not-found" />
+        </Stack>
+        {/* Couches globales */}
+        <OfflineBanner />
+        <Toast />
+      </GestureHandlerRootView>
+    </ErrorBoundary>
   );
 }
